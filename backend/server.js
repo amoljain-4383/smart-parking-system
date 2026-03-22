@@ -1,24 +1,39 @@
-// Supabase integration
+// Importing necessary libraries
+const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
 
-import { createClient } from '@supabase/supabase-js';
+// Initializing Express app
+const app = express();
+app.use(express.json());
 
-// Initialize Supabase client
-const supabaseUrl = 'your_supabase_url';
-const supabaseKey = 'your_supabase_key';
+// Supabase client initialization
+const supabaseUrl = 'https://YOUR_SUPABASE_URL';  // Replace with your Supabase URL
+const supabaseKey = 'YOUR_SUPABASE_KEY';  // Replace with your Supabase API key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Example function to fetch data
-async function fetchData() {
-  const { data, error } = await supabase
-    .from('your_table_name')
-    .select('*');
+// Sample route to fetch data from Supabase
+app.get('/data', async (req, res) => {
+    const { data, error } = await supabase
+        .from('YOUR_TABLE_NAME')  // Replace with your actual table name
+        .select('*');
 
-  if (error) {
-    console.error('Error fetching data:', error);
-    return;
-  }
+    if (error) return res.status(500).send(error);
+    res.status(200).json(data);
+});
 
-  console.log('Data fetched:', data);
-}
+// Sample route to insert data into Supabase
+app.post('/data', async (req, res) => {
+    const { name, value } = req.body;
+    const { data, error } = await supabase
+        .from('YOUR_TABLE_NAME')  // Replace with your actual table name
+        .insert([{ name, value }]);
 
-fetchData();
+    if (error) return res.status(500).send(error);
+    res.status(201).json(data);
+});
+
+// Starting the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
