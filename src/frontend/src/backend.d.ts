@@ -62,4 +62,6 @@ export interface backendInterface {
     isStripeConfigured(): Promise<boolean>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
+    getSharedState(): Promise<string>;
+    setSharedState(state: string): Promise<void>;
 }

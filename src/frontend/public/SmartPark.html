@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SmartPark" />
+<meta name="theme-color" content="#0a0f1e" />
+<title>SmartPark — Smart Parking System</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0a0f1e;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden}
+#app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(15,23,42,0.95);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;backdrop-filter:blur(12px);position:relative;z-index:10}
+.header-brand{display:flex;align-items:center;gap:8px}
+.header-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#22c55e);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.header-title{font-size:17px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#34d399,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-live{display:flex;align-items:center;gap:5px;font-size:10px;color:#6b7280}
+.pulsedot{position:relative;display:inline-flex;width:8px;height:8px}
+.pulsedot::before{content:'';position:absolute;inset:0;border-radius:50%;background:#22c55e;opacity:0.75;animation:ping 1.2s ease-in-out infinite}
+.pulsedot::after{content:'';position:relative;display:inline-flex;width:8px;height:8px;border-radius:50%;background:#22c55e}
+@keyframes ping{0%,100%{transform:scale(1);opacity:0.75}50%{transform:scale(1.8);opacity:0}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-green{background:#16a34a;color:#fff}
+.btn-green:hover{background:#15803d}
+.btn-outline{background:transparent;color:#e2e8f0;border:1px solid rgba(255,255,255,0.12)}
+.btn-outline:hover{background:rgba(255,255,255,0.06)}
+.btn-danger{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,0.3)}
+.btn-danger:hover{background:rgba(248,113,113,0.1)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-full{width:100%}
+.btn-icon{padding:8px;border-radius:10px}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.content::-webkit-scrollbar{display:none}
+
+/* Bottom nav */
+.bottom-nav{display:flex;border-top:1px solid rgba(255,255,255,0.08);background:rgba(15,23,42,0.97);backdrop-filter:blur(12px);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.bottom-nav::-webkit-scrollbar{display:none}
+.nav-item{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;cursor:pointer;border:none;background:transparent;color:#6b7280;font-size:9px;font-weight:500;transition:color 0.2s;position:relative}
+.nav-item.active{color:#60a5fa}
+.nav-item.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:24px;height:2px;border-radius:1px;background:#3b82f6}
+.nav-icon{font-size:20px;line-height:1}
+.nav-badge{position:absolute;top:6px;right:calc(50% - 14px);background:#ef4444;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center}
+
+/* Cards */
+.card{background:rgba(22,32,52,0.9);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:12px}
+.card-sm{padding:12px;border-radius:12px}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat-card{border-radius:12px;padding:10px;text-align:center}
+.stat-card.green{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25)}
+.stat-card.red{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.stat-card.blue{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25)}
+.stat-num{font-size:22px;font-weight:700;line-height:1}
+.stat-label{font-size:10px;margin-top:2px;opacity:0.8}
+.stat-card.green .stat-num,.stat-card.green .stat-label{color:#4ade80}
+.stat-card.red .stat-num,.stat-card.red .stat-label{color:#f87171}
+.stat-card.blue .stat-num,.stat-card.blue .stat-label{color:#60a5fa}
+
+/* Progress bar */
+.progress-wrap{margin:4px 0 12px}
+.progress-row{display:flex;justify-content:space-between;font-size:10px;color:#6b7280;margin-bottom:4px}
+.progress-bar{height:8px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.6s ease,background 0.6s ease}
+
+/* Slot grid */
+.floor-label{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:8px;margin-top:4px}
+.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.slot-btn{border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:2px solid;transition:transform 0.15s,box-shadow 0.15s;background:transparent;min-height:72px}
+.slot-btn:active:not(:disabled){transform:scale(0.95)}
+.slot-btn:disabled{cursor:not-allowed;opacity:0.7}
+.slot-btn.free{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.4)}
+.slot-btn.occupied{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.4)}
+.slot-btn.booked{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.4)}
+.slot-btn.unknown{background:rgba(107,114,128,0.1);border-color:rgba(107,114,128,0.3)}
+.slot-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.slot-btn.free .slot-circle{background:#22c55e}
+.slot-btn.occupied .slot-circle{background:#ef4444}
+.slot-btn.booked .slot-circle{background:#3b82f6}
+.slot-btn.unknown .slot-circle{background:#4b5563}
+.slot-status{font-size:9px;font-weight:600;letter-spacing:0.05em}
+.slot-btn.free .slot-status{color:#4ade80}
+.slot-btn.occupied .slot-status{color:#f87171}
+.slot-btn.booked .slot-status{color:#60a5fa}
+.slot-btn.unknown .slot-status{color:#9ca3af}
+.slot-time{font-size:8px;color:#6b7280}
+.divider{border:none;border-top:1px dashed rgba(255,255,255,0.08);margin:12px 0}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:10px;color:#6b7280;margin-top:8px}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+
+/* Booking dialog */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.dialog{background:#111827;border:1px solid rgba(255,255,255,0.1);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;animation:slideUp 0.25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.dialog h3{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:16px}
+.dialog-info{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px}
+.dialog-slot-id{font-size:32px;font-weight:800;color:#4ade80}
+.dialog-slot-floor{font-size:12px;color:#6b7280;margin-top:2px}
+.dialog-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.dialog-row span:first-child{color:#6b7280}
+.dialog-row span:last-child{color:#e2e8f0;font-weight:500}
+.dialog-btns{display:flex;gap:8px;margin-top:16px}
+.dialog-btns .btn{flex:1}
+
+/* Success */
+.success-icon{width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,0.15);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
+.token-box{background:#0a0f1e;border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:14px;text-align:center;margin:12px 0;font-family:monospace;font-size:18px;font-weight:700;color:#4ade80;letter-spacing:0.05em}
+
+/* FAQ */
+.faq-item{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;font-size:13px;font-weight:500;color:#e2e8f0;background:rgba(22,32,52,0.7)}
+.faq-q:active{background:rgba(255,255,255,0.04)}
+.faq-a{font-size:12px;color:#94a3b8;padding:0 14px;max-height:0;overflow:hidden;transition:max-height 0.25s ease,padding 0.25s ease;line-height:1.5}
+.faq-a.open{max-height:200px;padding:0 14px 12px}
+.faq-chevron{transition:transform 0.25s;font-size:12px;color:#6b7280}
+.faq-chevron.open{transform:rotate(180deg)}
+
+/* Booking cards */
+.booking-card{background:rgba(22,32,52,0.9);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;margin-bottom:10px}
+.booking-card.cancelled{opacity:0.5}
+.bc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.bc-slot{font-size:15px;font-weight:700;color:#e2e8f0}
+.bc-time{font-size:10px;color:#6b7280;margin-top:2px}
+.badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-active{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.badge-cancelled{background:rgba(107,114,128,0.15);color:#9ca3af;border:1px solid rgba(107,114,128,0.3)}
+.token-row{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 10px;font-family:monospace;font-size:12px;color:#60a5fa;margin:6px 0}
+.bc-meta{display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin:4px 0}
+
+/* Login */
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 120px);padding:24px}
+.login-logo{font-size:48px;margin-bottom:8px}
+.login-title{font-size:26px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#34d399,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.login-sub{font-size:12px;color:#6b7280;margin-bottom:28px;text-align:center}
+.login-form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
+.input{width:100%;padding:11px 14px;background:rgba(22,32,52,0.9);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e2e8f0;font-size:14px;outline:none;transition:border-color 0.2s}
+.input:focus{border-color:#3b82f6}
+.input::placeholder{color:#4b5563}
+.login-admin-hint{font-size:11px;color:#4b5563;text-align:center;margin-top:4px;cursor:pointer;padding:4px}
+.login-admin-hint:active{color:#60a5fa}
+
+/* Admin badge */
+.admin-badge{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:6px;font-size:10px;font-weight:700;padding:2px 6px;letter-spacing:0.04em}
+
+/* Profile */
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;margin:0 auto 12px}
+.profile-stat{background:rgba(22,32,52,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;text-align:center}
+.profile-stat-num{font-size:22px;font-weight:700;color:#60a5fa}
+.profile-stat-label{font-size:10px;color:#6b7280;margin-top:2px}
+
+/* Notifications */
+.notif-item{background:rgba(22,32,52,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
+.notif-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.notif-text{font-size:12px;color:#e2e8f0;line-height:1.4}
+.notif-time{font-size:10px;color:#4b5563;margin-top:3px}
+.notif-announcement{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#fbbf24;display:flex;gap:8px;align-items:center}
+
+/* Surprise */
+.surprise-btn{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none}
+
+/* Cost estimator */
+.estimator-card{background:rgba(22,32,52,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:12px}
+.estimator-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.estimator-label{font-size:12px;font-weight:600;color:#e2e8f0}
+.estimator-cost{font-size:14px;font-weight:700;color:#60a5fa}
+.range-input{width:100%;accent-color:#3b82f6;cursor:pointer;margin:4px 0}
+.estimator-hints{display:flex;justify-content:space-between;font-size:10px;color:#4b5563}
+
+/* Orbs */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);animation:orbf 8s ease-in-out infinite}
+.orb1{width:280px;height:280px;background:rgba(59,130,246,0.08);top:-80px;left:-60px;animation-duration:8s}
+.orb2{width:220px;height:220px;background:rgba(34,197,94,0.07);top:200px;right:-60px;animation-duration:11s;animation-delay:-3s}
+.orb3{width:180px;height:180px;background:rgba(139,92,246,0.07);bottom:100px;left:30px;animation-duration:13s;animation-delay:-6s}
+@keyframes orbf{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+
+/* Sections */
+.section-header{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;gap:10px}
+.empty-icon{font-size:40px;opacity:0.4}
+.empty-text{font-size:13px;color:#4b5563}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(22,32,52,0.7);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:8px}
+.toggle-label{font-size:13px;color:#e2e8f0}
+.toggle-switch{position:relative;width:40px;height:22px}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:#1f2937;cursor:pointer;transition:background 0.3s}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#6b7280;transition:transform 0.3s,background 0.3s}
+input:checked + .toggle-track{background:#1d4ed8}
+input:checked ~ .toggle-thumb, input:checked + .toggle-track + .toggle-thumb{transform:translateX(18px);background:#fff}
+
+/* Code block */
+.code-block{background:#050d1a;border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-top:8px}
+
+/* Toasts */
+#toast-container{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:calc(100% - 32px);max-width:400px}
+.toast{background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;font-size:12px;color:#e2e8f0;box-shadow:0 4px 20px rgba(0,0,0,0.4);display:flex;align-items:center;gap:8px;animation:toastIn 0.25s ease;pointer-events:auto;width:100%}
+.toast.success{border-color:rgba(34,197,94,0.4)}
+.toast.error{border-color:rgba(239,68,68,0.4)}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div id="app">
+  <div class="header">
+    <button onclick="showDownloadInfo()" class="btn btn-green btn-sm" style="font-size:11px;padding:6px 10px">&#x2B07; Install</button>
+    <div class="header-brand">
+      <div class="header-logo">&#x1F17F;</div>
+      <span class="header-title">SmartPark</span>
+    </div>
+    <div class="header-live">
+      <span class="pulsedot"></span>
+      Live
+      <button id="logout-btn" onclick="doLogout()" class="btn btn-sm btn-outline" style="padding:4px 8px;font-size:10px;display:none;margin-left:4px">Logout</button>
+    </div>
+  </div>
+
+  <div id="main-content"></div>
+
+  <nav id="bottom-nav" class="bottom-nav" style="display:none">
+    <button class="nav-item active" onclick="setTab('parking')" id="nav-parking">
+      <span class="nav-icon">&#x1F697;</span>
+      <span>Parking</span>
+    </button>
+    <button class="nav-item" onclick="setTab('bookings')" id="nav-bookings">
+      <span class="nav-icon">&#x1F4C5;</span>
+      <span>Bookings</span>
+    </button>
+    <button class="nav-item" onclick="setTab('alerts')" id="nav-alerts">
+      <span class="nav-icon">&#x1F514;</span>
+      <span>Alerts</span>
+      <span class="nav-badge" id="alert-badge" style="display:none">!</span>
+    </button>
+    <button class="nav-item" onclick="setTab('profile')" id="nav-profile">
+      <span class="nav-icon">&#x1F464;</span>
+      <span>Profile</span>
+    </button>
+    <button class="nav-item" onclick="setTab('help')" id="nav-help">
+      <span class="nav-icon">&#x2753;</span>
+      <span>Help</span>
+    </button>
+  </nav>
+</div>
+
+<!-- Booking overlay -->
+<div id="booking-overlay" class="overlay" onclick="closeBookingDialog(event)">
+  <div class="dialog" onclick="event.stopPropagation()">
+    <h3>Confirm Booking</h3>
+    <div class="dialog-info">
+      <div class="dialog-slot-id" id="dlg-slot-id"></div>
+      <div class="dialog-slot-floor" id="dlg-slot-floor"></div>
+    </div>
+    <div class="dialog-row"><span>Rate</span><span id="dlg-rate"></span></div>
+    <div class="dialog-row"><span>Car Number</span><span id="dlg-car"></span></div>
+    <div class="dialog-row"><span>Estimated Cost</span><span id="dlg-est" style="color:#60a5fa"></span></div>
+    <div class="dialog-btns">
+      <button class="btn btn-outline" onclick="closeBookingDialog()">Cancel</button>
+      <button class="btn btn-primary" id="confirm-btn" onclick="confirmBooking()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success overlay -->
+<div id="success-overlay" class="overlay" onclick="closeSuccessDialog()">
+  <div class="dialog" onclick="event.stopPropagation()">
+    <div class="success-icon">&#x2705;</div>
+    <div style="text-align:center">
+      <h3 style="text-align:center;margin-bottom:4px">Slot Booked!</h3>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:0">Your parking token:</div>
+    </div>
+    <div class="token-box" id="success-token"></div>
+    <p style="font-size:11px;color:#4b5563;text-align:center;margin-bottom:16px">Save this token. Use My Bookings to cancel.</p>
+    <button class="btn btn-primary btn-full" onclick="closeSuccessDialog()">Done</button>
+  </div>
+</div>
+
+<!-- Install info overlay -->
+<div id="install-overlay" class="overlay" onclick="document.getElementById('install-overlay').classList.remove('open')">
+  <div class="dialog" onclick="event.stopPropagation()">
+    <h3>&#x1F4F1; Install SmartPark</h3>
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:600;color:#4ade80;margin-bottom:8px">&#x1F4F1; Android (Chrome)</div>
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:6px">
+        <li style="display:flex;gap:8px;align-items:flex-start"><span style="min-width:18px;height:18px;background:#166534;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span><span style="font-size:12px;color:#94a3b8">Open this page in Chrome</span></li>
+        <li style="display:flex;gap:8px;align-items:flex-start"><span style="min-width:18px;height:18px;background:#166534;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span><span style="font-size:12px;color:#94a3b8">Tap &#x22EE; menu &rarr; Add to Home Screen</span></li>
+        <li style="display:flex;gap:8px;align-items:flex-start"><span style="min-width:18px;height:18px;background:#166534;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span><span style="font-size:12px;color:#94a3b8">Tap Add &mdash; SmartPark appears on your home screen!</span></li>
+      </ol>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:8px">&#x1F34E; iPhone / Safari</div>
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:6px">
+        <li style="display:flex;gap:8px;align-items:flex-start"><span style="min-width:18px;height:18px;background:#1e3a5f;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span><span style="font-size:12px;color:#94a3b8">Open in Safari on iPhone/iPad</span></li>
+        <li style="display:flex;gap:8px;align-items:flex-start"><span style="min-width:18px;height:18px;background:#1e3a5f;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span><span style="font-size:12px;color:#94a3b8">Tap Share &#x2B06; button at the bottom</span></li>
+        <li style="display:flex;gap:8px;align-items:flex-start"><span style="min-width:18px;height:18px;background:#1e3a5f;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span><span style="font-size:12px;color:#94a3b8">Tap Add to Home Screen &mdash; Done!</span></li>
+      </ol>
+    </div>
+    <button class="btn btn-outline btn-full" onclick="document.getElementById('install-overlay').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ==================== STATE ====================
+const STORE_KEY = 'smartpark_state_v2';
+const CHANNEL_NAME = 'smartpark_sync';
+let _state = null;
+let _session = null;
+let _tab = 'parking';
+let _selectedSlot = null;
+let _estimatorHours = 2;
+let _syncChannel = null;
+let _syncTimer = null;
+let _expandedFaq = null;
+let _editingCar = false;
+
+function defaultSlots() {
+  const now = new Date().toISOString();
+  const s = [];
+  for(let i=1;i<=6;i++) s.push({id:`A${i}`,floor:'A',status:'unknown',lastUpdated:now});
+  for(let i=1;i<=6;i++) s.push({id:`B${i}`,floor:'B',status:'unknown',lastUpdated:now});
+  return s;
+}
+function defaultState() {
+  return {slots:defaultSlots(),bookings:[],hourlyRate:50,lastSyncAt:new Date().toISOString(),demoMode:false,adminAnnouncement:''};
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) {
+      const p = JSON.parse(raw);
+      const ids = new Set(p.slots.map(s=>s.id));
+      for(const ds of defaultSlots()) if(!ids.has(ds.id)) p.slots.push(ds);
+      return p;
+    }
+  } catch{}
+  return defaultState();
+}
+function saveState(state) {
+  const updated = {...state, lastSyncAt: new Date().toISOString()};
+  localStorage.setItem(STORE_KEY, JSON.stringify(updated));
+  try {
+    if(!_syncChannel) _syncChannel = new BroadcastChannel(CHANNEL_NAME);
+    _syncChannel.postMessage({type:'STATE_UPDATE',payload:updated});
+  } catch{}
+  return updated;
+}
+
+function genToken() { return 'TKN-' + Math.random().toString(36).slice(2,8).toUpperCase(); }
+
+function bookSlot(slotId, carNumber, userName) {
+  const state = loadState();
+  const slot = state.slots.find(s=>s.id===slotId);
+  if(!slot) return {success:false,error:'Slot not found'};
+  if(slot.status!=='free') return {success:false,error:'Slot just got taken — pick another'};
+  const token = genToken();
+  const now = new Date().toISOString();
+  slot.status='booked'; slot.lastUpdated=now; slot.bookedBy=carNumber; slot.bookingToken=token;
+  state.bookings.push({token,slotId,carNumber,userName,bookedAt:now,cancelled:false,hourlyRate:state.hourlyRate});
+  saveState(state);
+  _state = loadState();
+  return {success:true,token};
+}
+function cancelBooking(token) {
+  const state = loadState();
+  const b = state.bookings.find(b=>b.token===token&&!b.cancelled);
+  if(!b) return {success:false,error:'Booking not found'};
+  b.cancelled=true; b.cancelledAt=new Date().toISOString();
+  const slot = state.slots.find(s=>s.id===b.slotId);
+  if(slot&&slot.status==='booked'&&slot.bookingToken===token) {
+    slot.status='free'; slot.lastUpdated=new Date().toISOString();
+    delete slot.bookedBy; delete slot.bookingToken;
+  }
+  saveState(state); _state=loadState(); return {success:true};
+}
+
+// ==================== AUTH ====================
+const ADMINS = [{u:'admin',p:'admin123'},{u:'Amol4383',p:'Amol@4383'}];
+function isAdmin(u,p){return ADMINS.some(a=>a.u===u&&a.p===p);}
+
+// ==================== INIT ====================
+window.addEventListener('DOMContentLoaded', () => {
+  _state = loadState();
+  const savedSession = sessionStorage.getItem('sp_session');
+  if(savedSession) {
+    try { _session = JSON.parse(savedSession); showApp(); } catch{showLogin();}
+  } else { showLogin(); }
+  try {
+    _syncChannel = new BroadcastChannel(CHANNEL_NAME);
+    _syncChannel.addEventListener('message', e=>{
+      if(e.data?.type==='STATE_UPDATE'){_state=e.data.payload; if(_session)renderTab();}
+    });
+  } catch{}
+  _syncTimer = setInterval(()=>{
+    const fresh = loadState();
+    if(fresh.lastSyncAt !== (_state&&_state.lastSyncAt)) {
+      _state = fresh;
+      if(_session) renderTab();
+    }
+  }, 3000);
+});
+
+function showLogin() {
+  document.getElementById('bottom-nav').style.display='none';
+  document.getElementById('logout-btn').style.display='none';
+  document.getElementById('main-content').innerHTML = `
+  <div class="login-wrap">
+    <div class="login-logo">&#x1F17F;</div>
+    <div class="login-title">SmartPark</div>
+    <div class="login-sub">Real-time smart parking management</div>
+    <div class="login-form">
+      <input class="input" id="inp-name" placeholder="Your Name" autocomplete="name" />
+      <input class="input" id="inp-car" placeholder="Car Number (e.g. MH01AB1234)" autocomplete="off" />
+      <button class="btn btn-primary btn-full" onclick="doLogin()" style="margin-top:4px">Login &amp; Continue</button>
+      <div class="login-admin-hint" onclick="fillAdmin()">Admin? Tap here</div>
+    </div>
+  </div>`;
+  document.getElementById('inp-name').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('inp-car').focus(); });
+  document.getElementById('inp-car').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+}
+function fillAdmin(){ document.getElementById('inp-name').value='admin'; document.getElementById('inp-car').value='admin123'; }
+function doLogin() {
+  const name = document.getElementById('inp-name').value.trim();
+  const car = document.getElementById('inp-car').value.trim().toUpperCase();
+  if(!name){showToast('Enter your name','error');return;}
+  if(!car){showToast('Enter car number','error');return;}
+  const admin = isAdmin(name.toLowerCase()===name?name:name, car.includes('@')||car.length<8?car:car);
+  _session = {name,carNumber:car,isAdmin:isAdmin(name,car.replace(/ /g,''))||isAdmin(name.toLowerCase(),car)};
+  // Also try with original case
+  if(!_session.isAdmin) _session.isAdmin = ADMINS.some(a=>a.u===name&&a.p===car);
+  sessionStorage.setItem('sp_session', JSON.stringify(_session));
+  showApp();
+}
+function doLogout() {
+  sessionStorage.removeItem('sp_session');
+  _session=null; _tab='parking';
+  showLogin();
+}
+function showDownloadInfo(){document.getElementById('install-overlay').classList.add('open');}
+
+function showApp() {
+  document.getElementById('bottom-nav').style.display='flex';
+  document.getElementById('logout-btn').style.display='inline-flex';
+  setTab('parking');
+}
+
+// ==================== TABS ====================
+function setTab(tab) {
+  _tab = tab;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const navEl = document.getElementById('nav-'+tab);
+  if(navEl) navEl.classList.add('active');
+  renderTab();
+}
+function renderTab() {
+  _state = loadState();
+  updateAlertBadge();
+  const el = document.getElementById('main-content');
+  if(_tab==='parking') el.innerHTML = renderParking();
+  else if(_tab==='bookings') el.innerHTML = renderBookings();
+  else if(_tab==='alerts') el.innerHTML = renderAlerts();
+  else if(_tab==='profile') el.innerHTML = renderProfile();
+  else if(_tab==='help') el.innerHTML = renderHelp();
+  attachHandlers();
+}
+function updateAlertBadge() {
+  const b = document.getElementById('alert-badge');
+  if(_state.adminAnnouncement) { b.style.display='flex'; } else { b.style.display='none'; }
+}
+
+// ==================== PARKING TAB ====================
+function renderParking() {
+  const free=_state.slots.filter(s=>s.status==='free').length;
+  const occ=_state.slots.filter(s=>s.status==='occupied').length;
+  const bkd=_state.slots.filter(s=>s.status==='booked').length;
+  const total=_state.slots.length;
+  const pct=total>0?Math.round(((occ+bkd)/total)*100):0;
+  const fillColor=pct>80?'#ef4444':pct>50?'#f59e0b':'#22c55e';
+  const floors=[...new Set(_state.slots.map(s=>s.floor))];
+  let slotsHtml='';
+  floors.forEach((floor,fi)=>{
+    if(fi>0) slotsHtml+=`<hr class="divider">`;
+    slotsHtml+=`<div class="floor-label">Floor ${floor} &mdash; Tap a free slot to book</div><div class="slot-grid">`;
+    _state.slots.filter(s=>s.floor===floor).forEach(slot=>{
+      const canBook=slot.status==='free';
+      const statusLabel=slot.status==='unknown'?'No Data':slot.status.charAt(0).toUpperCase()+slot.status.slice(1);
+      const timeStr=slot.lastUpdated?new Date(slot.lastUpdated).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+      slotsHtml+=`<button class="slot-btn ${slot.status}" onclick="${canBook?`openBooking('${slot.id}')`:''}"
+        ${!canBook?'disabled':''} title="Slot ${slot.id} - ${statusLabel}">
+        <div class="slot-circle">${slot.id}</div>
+        <span class="slot-status">${statusLabel.toUpperCase().slice(0,3)}</span>
+        ${timeStr?`<span class="slot-time">${timeStr}</span>`:''}
+      </button>`;
+    });
+    slotsHtml+='</div>';
+  });
+  return `
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="stat-num">${free}</div><div class="stat-label">Free</div></div>
+      <div class="stat-card red"><div class="stat-num">${occ}</div><div class="stat-label">Occupied</div></div>
+      <div class="stat-card blue"><div class="stat-num">${bkd}</div><div class="stat-label">Booked</div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-row"><span>Occupancy</span><span>${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${fillColor}"></div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn surprise-btn" style="flex:1" onclick="surpriseMe()">&#x2728; Surprise Me!</button>
+    </div>
+    <div class="estimator-card">
+      <div class="estimator-row">
+        <span class="estimator-label">Cost Estimator</span>
+        <span class="estimator-cost" id="est-cost">&#x20B9;${_estimatorHours*_state.hourlyRate}</span>
+      </div>
+      <input type="range" min="1" max="8" value="${_estimatorHours}" class="range-input" id="est-range" oninput="updateEstimator(this.value)" />
+      <div class="estimator-hints"><span>1 hr</span><span id="est-label">${_estimatorHours} hr${_estimatorHours>1?'s':''} &times; &#x20B9;${_state.hourlyRate}/hr</span><span>8 hrs</span></div>
+    </div>
+    ${slotsHtml}
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Free</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Occupied</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Booked</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4b5563"></div>No Data</div>
+    </div>
+    ${_session&&_session.isAdmin?`<div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)">
+      <div style="font-size:11px;color:#f87171;font-weight:600;margin-bottom:8px">&#x1F510; Admin Quick Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-outline" onclick="adminResetAll()">Reset All Slots</button>
+        <button class="btn btn-sm btn-outline" onclick="adminClearExpired()">Clear Expired</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+function updateEstimator(val) {
+  _estimatorHours=parseInt(val);
+  const c=document.getElementById('est-cost');
+  const l=document.getElementById('est-label');
+  if(c) c.textContent='\u20B9'+(_estimatorHours*_state.hourlyRate);
+  if(l) l.textContent=`${_estimatorHours} hr${_estimatorHours>1?'s':''} \xd7 \u20B9${_state.hourlyRate}/hr`;
+}
+function surpriseMe() {
+  const free=_state.slots.filter(s=>s.status==='free');
+  if(!free.length){showToast('No free slots available','error');return;}
+  const slot=free[Math.floor(Math.random()*free.length)];
+  showToast(`\u2728 Surprise! Slot ${slot.id} (Floor ${slot.floor}) selected`,'success');
+  openBooking(slot.id);
+}
+function openBooking(slotId) {
+  _selectedSlot=_state.slots.find(s=>s.id===slotId);
+  if(!_selectedSlot||_selectedSlot.status!=='free'){showToast('Slot no longer free','error');return;}
+  document.getElementById('dlg-slot-id').textContent=slotId;
+  document.getElementById('dlg-slot-floor').textContent='Floor '+_selectedSlot.floor;
+  document.getElementById('dlg-rate').textContent='\u20B9'+_state.hourlyRate+'/hr';
+  document.getElementById('dlg-car').textContent=_session.carNumber;
+  document.getElementById('dlg-est').textContent='\u20B9'+(_estimatorHours*_state.hourlyRate)+' est.';
+  document.getElementById('booking-overlay').classList.add('open');
+}
+function closeBookingDialog(e) {
+  if(!e||e.target===document.getElementById('booking-overlay')) {
+    document.getElementById('booking-overlay').classList.remove('open');
+    _selectedSlot=null;
+  }
+}
+function confirmBooking() {
+  if(!_selectedSlot)return;
+  const btn=document.getElementById('confirm-btn');
+  btn.textContent='Booking...'; btn.disabled=true;
+  setTimeout(()=>{
+    const result=bookSlot(_selectedSlot.id,_session.carNumber,_session.name);
+    btn.textContent='Confirm'; btn.disabled=false;
+    document.getElementById('booking-overlay').classList.remove('open');
+    if(result.success){
+      document.getElementById('success-token').textContent=result.token;
+      document.getElementById('success-overlay').classList.add('open');
+      showToast('Slot '+_selectedSlot.id+' booked!','success');
+    } else { showToast(result.error,'error'); }
+    _selectedSlot=null;
+  },500);
+}
+function closeSuccessDialog(){document.getElementById('success-overlay').classList.remove('open');renderTab();}
+function adminResetAll() {
+  const s=loadState();
+  const now=new Date().toISOString();
+  s.slots.forEach(slot=>{
+    if(slot.status==='booked'&&slot.bookingToken){
+      const b=s.bookings.find(bk=>bk.token===slot.bookingToken&&!bk.cancelled);
+      if(b){b.cancelled=true;b.cancelledAt=now;}
+    }
+    slot.status='free';slot.lastUpdated=now;delete slot.bookedBy;delete slot.bookingToken;
+  });
+  saveState(s);_state=loadState();renderTab();showToast('All slots reset','success');
+}
+function adminClearExpired() {
+  const s=loadState();
+  s.bookings.filter(b=>!b.cancelled).forEach(b=>{
+    const age=(Date.now()-new Date(b.bookedAt).getTime())/3600000;
+    if(age>2){b.cancelled=true;b.cancelledAt=new Date().toISOString();
+      const slot=s.slots.find(sl=>sl.id===b.slotId);
+      if(slot&&slot.bookingToken===b.token){slot.status='free';delete slot.bookedBy;delete slot.bookingToken;slot.lastUpdated=new Date().toISOString();}
+    }
+  });
+  saveState(s);_state=loadState();renderTab();showToast('Expired bookings cleared','success');
+}
+
+// ==================== BOOKINGS TAB ====================
+function renderBookings() {
+  const myAll=_state.bookings.filter(b=>b.carNumber===_session.carNumber);
+  const active=myAll.filter(b=>!b.cancelled);
+  let html=`<div class="content"><div class="section-header">My Bookings <span class="badge badge-active">${active.length} active</span></div>`;
+  if(!myAll.length) {
+    html+=`<div class="empty"><div class="empty-icon">&#x1F4C5;</div><div class="empty-text">No bookings yet</div>
+    <button class="btn btn-outline btn-sm" onclick="setTab('parking')" style="margin-top:8px">Browse slots</button></div>`;
+  } else {
+    myAll.forEach((b,i)=>{
+      html+=`<div class="booking-card ${b.cancelled?'cancelled':''}">
+        <div class="bc-header">
+          <div><div class="bc-slot">Slot ${b.slotId}</div><div class="bc-time">${new Date(b.bookedAt).toLocaleString()}</div></div>
+          <span class="badge ${b.cancelled?'badge-cancelled':'badge-active'}">${b.cancelled?'Cancelled':'Active'}</span>
+        </div>
+        <div class="token-row">&#x1F3AB; <span>${b.token}</span></div>
+        <div class="bc-meta"><span>&#x20B9;${b.hourlyRate}/hr</span><span>${b.carNumber}</span></div>
+        ${!b.cancelled?`<button class="btn btn-danger btn-sm btn-full" onclick="doCancelBooking('${b.token}')" style="margin-top:8px">&#x1F5D1; Cancel Booking</button>`:''}
+      </div>`;
+    });
+  }
+  html+='</div>';
+  return html;
+}
+function doCancelBooking(token) {
+  const result=cancelBooking(token);
+  if(result.success){showToast('Booking cancelled','success');renderTab();}
+  else showToast(result.error,'error');
+}
+
+// ==================== ALERTS TAB ====================
+function renderAlerts() {
+  const myBookings=_state.bookings.filter(b=>b.carNumber===_session.carNumber).slice(-5).reverse();
+  let html=`<div class="content"><div class="section-header">Alerts &amp; Notifications</div>`;
+  if(_state.adminAnnouncement) {
+    html+=`<div class="notif-announcement">&#x1F4E2; ${_state.adminAnnouncement}</div>`;
+  }
+  const notifEnabled = localStorage.getItem('sp_notif')==='1';
+  html+=`<div class="toggle-row">
+    <span class="toggle-label">Enable Push Notifications</span>
+    <label class="toggle-switch">
+      <input type="checkbox" ${notifEnabled?'checked':''} onchange="toggleNotif(this.checked)">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>`;
+  if(!myBookings.length&&!_state.adminAnnouncement) {
+    html+=`<div class="empty"><div class="empty-icon">&#x1F514;</div><div class="empty-text">No notifications yet</div></div>`;
+  } else {
+    myBookings.forEach(b=>{
+      html+=`<div class="notif-item">
+        <div class="notif-icon">${b.cancelled?'&#x274C;':'&#x2705;'}</div>
+        <div><div class="notif-text">${b.cancelled?'Booking cancelled for slot '+b.slotId:'Slot '+b.slotId+' booked successfully'}</div>
+        <div class="notif-time">${new Date(b.cancelled&&b.cancelledAt?b.cancelledAt:b.bookedAt).toLocaleString()}</div></div>
+      </div>`;
+    });
+  }
+  html+='</div>';
+  return html;
+}
+function toggleNotif(enabled) {
+  if(enabled && 'Notification' in window) {
+    Notification.requestPermission().then(p=>{
+      if(p==='granted'){localStorage.setItem('sp_notif','1');showToast('Notifications enabled','success');}
+      else{localStorage.removeItem('sp_notif');showToast('Permission denied','error');renderTab();}
+    });
+  } else { localStorage.removeItem('sp_notif');showToast('Notifications disabled'); }
+}
+
+// ==================== PROFILE TAB ====================
+function renderProfile() {
+  const allBookings=_state.bookings.filter(b=>b.carNumber===_session.carNumber);
+  const active=allBookings.filter(b=>!b.cancelled).length;
+  const totalSpend=allBookings.filter(b=>!b.cancelled).reduce((sum,b)=>sum+b.hourlyRate*2,0);
+  const initial=_session.name?_session.name[0].toUpperCase():'?';
+  return `<div class="content">
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="profile-avatar">${initial}</div>
+      <div style="font-size:18px;font-weight:700;color:#e2e8f0">${_session.name}</div>
+      <div style="font-size:13px;color:#6b7280;margin-top:2px">${_session.carNumber}
+        ${_session.isAdmin?'<span class="admin-badge" style="margin-left:6px">ADMIN</span>':''}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div class="profile-stat"><div class="profile-stat-num">${allBookings.length}</div><div class="profile-stat-label">Total Bookings</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:#4ade80">${active}</div><div class="profile-stat-label">Active</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:#c084fc">&#x20B9;${totalSpend}</div><div class="profile-stat-label">Est. Spend</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:10px">&#x1F4CB; Account Details</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#6b7280">Name</span>
+          <span style="color:#e2e8f0">${_session.name}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#6b7280">Car Number</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="color:#e2e8f0" id="car-display">${_session.carNumber}</span>
+            <button class="btn btn-sm btn-outline" onclick="editCarNumber()" style="padding:3px 8px;font-size:11px">Edit</button>
+          </div>
+        </div>
+        <div id="edit-car-row" style="display:none;flex-direction:column;gap:6px">
+          <input class="input" id="new-car-input" placeholder="New car number" value="${_session.carNumber}" />
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveCarNumber()">Save</button>
+            <button class="btn btn-outline btn-sm" style="flex:1" onclick="cancelEditCar()">Cancel</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#6b7280">Hourly Rate</span>
+          <span style="color:#60a5fa">&#x20B9;${_state.hourlyRate}/hr</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-danger btn-full" onclick="doLogout()" style="margin-top:8px">&#x1F6AA; Logout</button>
+  </div>`;
+}
+function editCarNumber(){document.getElementById('edit-car-row').style.display='flex';}
+function cancelEditCar(){document.getElementById('edit-car-row').style.display='none';}
+function saveCarNumber(){
+  const val=document.getElementById('new-car-input').value.trim().toUpperCase();
+  if(!val){showToast('Enter a car number','error');return;}
+  _session.carNumber=val;sessionStorage.setItem('sp_session',JSON.stringify(_session));
+  showToast('Car number updated','success');renderTab();
+}
+
+// ==================== HELP TAB ====================
+const FAQS=[
+  {q:'What do slot colors mean?',a:'Green = Free (tap to book), Red = Occupied (sensor), Blue = Booked (reserved), Gray = No sensor data yet.'},
+  {q:'How do I book a slot?',a:'Tap any green Free slot in the Parking tab, confirm in the popup. You get a unique token.'},
+  {q:'Can two users book the same slot?',a:'No — SmartPark uses atomic locking. If two users tap the same free slot, only one booking succeeds.'},
+  {q:'How do I cancel my booking?',a:'Go to My Bookings tab and tap the Cancel button next to your booking.'},
+  {q:'How does the hardware connect?',a:'The ESP8266 sends POST requests to the app API with the slot ID and sensor status. Admin → IoT Panel has the full Arduino code.'},
+  {q:'What is the hourly rate?',a:'Default rate is \u20B950/hr. Admin can change it in the main app Settings tab.'},
+];
+function renderHelp() {
+  let faqHtml=FAQS.map((f,i)=>`
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(${i})">
+        <span>${f.q}</span>
+        <span class="faq-chevron ${_expandedFaq===i?'open':''}" id="faq-chevron-${i}">&#x25BC;</span>
+      </div>
+      <div class="faq-a ${_expandedFaq===i?'open':''}" id="faq-a-${i}">${f.a}</div>
+    </div>`).join('');
+  return `<div class="content">
+    <div class="section-header">Help &amp; FAQ</div>
+    ${faqHtml}
+    <div class="card" style="margin-top:12px">
+      <div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:8px">&#x1F50C; Arduino API</div>
+      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px">Send sensor data from your ESP8266:</p>
+      <div class="code-block">POST /api/sensor\nContent-Type: application/json\n\n{\n  &quot;slotId&quot;: &quot;A1&quot;,\n  &quot;occupied&quot;: true,\n  &quot;apiKey&quot;: &quot;SMARTPARK_HW_2024&quot;\n}</div>
+      <p style="font-size:11px;color:#4b5563;margin-top:8px">Admin &rarr; IoT Panel in the main app has the full setup guide.</p>
+    </div>
+  </div>`;
+}
+function toggleFaq(i){
+  _expandedFaq=_expandedFaq===i?null:i;
+  document.querySelectorAll('.faq-a').forEach((el,idx)=>el.classList.toggle('open',idx===_expandedFaq));
+  document.querySelectorAll('.faq-chevron').forEach((el,idx)=>el.classList.toggle('open',idx===_expandedFaq));
+}
+
+function attachHandlers(){}
+
+// ==================== TOASTS ====================
+function showToast(msg, type='') {
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast '+(type||'');
+  const icon=type==='success'?'&#x2705; ':type==='error'?'&#x274C; ':'&#x2139;&#xFE0F; ';
+  t.innerHTML=icon+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},2800);
+}
+</script>
+</body>
+</html>

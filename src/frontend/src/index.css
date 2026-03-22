@@ -2,82 +2,354 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/assets/fonts/PlusJakartaSans.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/assets/fonts/BricolageGrotesque.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
 @layer base {
   :root {
-    --radius: 0.625rem;
-    --background: 1 0 0;
-    --foreground: 0.145 0 0;
+    --radius: 0.75rem;
+    /* Light mode (not used - app is dark) */
+    --background: 0.97 0.008 240;
+    --foreground: 0.18 0.03 240;
     --card: 1 0 0;
-    --card-foreground: 0.145 0 0;
+    --card-foreground: 0.18 0.03 240;
     --popover: 1 0 0;
-    --popover-foreground: 0.145 0 0;
-    --primary: 0.205 0 0;
-    --primary-foreground: 0.985 0 0;
-    --secondary: 0.97 0 0;
-    --secondary-foreground: 0.205 0 0;
-    --muted: 0.97 0 0;
-    --muted-foreground: 0.556 0 0;
-    --accent: 0.97 0 0;
-    --accent-foreground: 0.205 0 0;
+    --popover-foreground: 0.18 0.03 240;
+    --primary: 0.55 0.18 195;
+    --primary-foreground: 0.98 0.005 195;
+    --secondary: 0.35 0.15 285;
+    --secondary-foreground: 0.95 0.01 285;
+    --muted: 0.93 0.01 240;
+    --muted-foreground: 0.5 0.02 240;
+    --accent: 0.72 0.18 60;
+    --accent-foreground: 0.15 0.04 60;
     --destructive: 0.577 0.245 27.325;
     --destructive-foreground: 0.985 0 0;
-    --border: 0.922 0 0;
-    --input: 0.922 0 0;
-    --ring: 0.708 0 0;
-    --chart-1: 0.646 0.222 41.116;
-    --chart-2: 0.6 0.118 184.704;
-    --chart-3: 0.398 0.07 227.392;
-    --chart-4: 0.828 0.189 84.429;
-    --chart-5: 0.769 0.188 70.08;
-    --sidebar: 0.985 0 0;
-    --sidebar-foreground: 0.145 0 0;
-    --sidebar-primary: 0.205 0 0;
-    --sidebar-primary-foreground: 0.985 0 0;
-    --sidebar-accent: 0.97 0 0;
-    --sidebar-accent-foreground: 0.205 0 0;
-    --sidebar-border: 0.922 0 0;
-    --sidebar-ring: 0.708 0 0;
+    --border: 0.88 0.015 240;
+    --input: 0.88 0.015 240;
+    --ring: 0.55 0.18 195;
+    --gold: 0.78 0.18 70;
+    --gold-foreground: 0.2 0.05 60;
+    --chart-1: 0.55 0.18 195;
+    --chart-2: 0.65 0.2 160;
+    --chart-3: 0.72 0.18 60;
+    --chart-4: 0.35 0.15 285;
+    --chart-5: 0.65 0.22 30;
+    --sidebar: 0.16 0.04 250;
+    --sidebar-foreground: 0.9 0.02 240;
+    --sidebar-primary: 0.55 0.18 195;
+    --sidebar-primary-foreground: 0.98 0.005 195;
+    --sidebar-accent: 0.22 0.06 250;
+    --sidebar-accent-foreground: 0.9 0.02 240;
+    --sidebar-border: 0.25 0.05 250;
+    --sidebar-ring: 0.55 0.18 195;
+    /* Safe area insets */
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-top: env(safe-area-inset-top, 0px);
   }
 
   .dark {
-    --background: 0.145 0 0;
-    --foreground: 0.985 0 0;
-    --card: 0.205 0 0;
-    --card-foreground: 0.985 0 0;
-    --popover: 0.269 0 0;
-    --popover-foreground: 0.985 0 0;
-    --primary: 0.922 0 0;
-    --primary-foreground: 0.205 0 0;
-    --secondary: 0.269 0 0;
-    --secondary-foreground: 0.985 0 0;
-    --muted: 0.269 0 0;
-    --muted-foreground: 0.708 0 0;
-    --accent: 0.371 0 0;
-    --accent-foreground: 0.985 0 0;
+    /* Deep navy dark palette */
+    --background: 0.1 0.025 240;
+    --foreground: 0.93 0.008 240;
+    --card: 0.15 0.035 245;
+    --card-foreground: 0.93 0.008 240;
+    --popover: 0.18 0.04 245;
+    --popover-foreground: 0.93 0.008 240;
+    --primary: 0.55 0.18 195;
+    --primary-foreground: 0.98 0.005 195;
+    --secondary: 0.35 0.15 285;
+    --secondary-foreground: 0.95 0.01 285;
+    --muted: 0.22 0.03 245;
+    --muted-foreground: 0.6 0.03 240;
+    --accent: 0.72 0.18 60;
+    --accent-foreground: 0.15 0.04 60;
     --destructive: 0.704 0.191 22.216;
-    --destructive-foreground: 0.205 0 0;
-    --border: 1 0 0 / 10%;
+    --destructive-foreground: 0.1 0 0;
+    --border: 0.28 0.04 245;
     --input: 1 0 0 / 15%;
-    --ring: 0.556 0 0;
-    --chart-1: 0.488 0.243 264.376;
-    --chart-2: 0.696 0.17 162.48;
-    --chart-3: 0.769 0.188 70.08;
-    --chart-4: 0.627 0.265 303.9;
-    --chart-5: 0.645 0.246 16.439;
-    --sidebar: 0.205 0 0;
-    --sidebar-foreground: 0.985 0 0;
-    --sidebar-primary: 0.488 0.243 264.376;
-    --sidebar-primary-foreground: 0.985 0 0;
-    --sidebar-accent: 0.269 0 0;
-    --sidebar-accent-foreground: 0.985 0 0;
+    --ring: 0.55 0.18 195;
+    --gold: 0.78 0.18 70;
+    --gold-foreground: 0.2 0.05 60;
+    --chart-1: 0.55 0.18 195;
+    --chart-2: 0.65 0.2 160;
+    --chart-3: 0.72 0.18 60;
+    --chart-4: 0.35 0.15 285;
+    --chart-5: 0.65 0.22 30;
+    --sidebar: 0.1 0.035 252;
+    --sidebar-foreground: 0.9 0.02 240;
+    --sidebar-primary: 0.55 0.18 195;
+    --sidebar-primary-foreground: 0.98 0.005 195;
+    --sidebar-accent: 0.18 0.05 250;
+    --sidebar-accent-foreground: 0.9 0.02 240;
     --sidebar-border: 1 0 0 / 10%;
-    --sidebar-ring: 0.439 0 0;
+    --sidebar-ring: 0.55 0.18 195;
   }
 
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  }
+
+  /* Viewport fit for notched devices */
+  html {
+    height: -webkit-fill-available;
+  }
+}
+
+@layer components {
+  /* ============================
+   * App Shell (phone-frame layout)
+   * ============================ */
+  .app-shell {
+    @apply relative flex flex-col bg-background;
+    min-height: 100dvh;
+    max-width: 430px;
+    margin: 0 auto;
+    box-shadow: 0 0 0 1px oklch(0.28 0.04 245 / 60%), 0 8px 64px -8px
+      oklch(0.08 0.04 250 / 60%);
+  }
+
+  .app-status-bar {
+    height: var(--safe-area-top);
+    background: oklch(var(--card));
+  }
+
+  .app-header {
+    @apply sticky top-0 z-20 flex items-center justify-between px-4 py-3 border-b;
+    background: linear-gradient(
+      135deg,
+      oklch(0.18 0.06 220),
+      oklch(0.13 0.05 240)
+    );
+    border-color: oklch(0.28 0.04 245 / 50%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .app-content {
+    @apply flex-1 overflow-y-auto px-4 py-4;
+    padding-bottom: calc(5rem + var(--safe-area-bottom));
+  }
+
+  /* ============================
+   * Bottom Navigation Bar
+   * ============================ */
+  .app-bottom-nav {
+    @apply fixed bottom-0 left-1/2 z-30 flex items-stretch;
+    transform: translateX(-50%);
+    width: min(430px, 100vw);
+    background: oklch(0.12 0.04 245);
+    border-top: 1px solid oklch(0.28 0.04 245 / 60%);
+    padding-bottom: var(--safe-area-bottom);
+    box-shadow: 0 -4px 24px oklch(0.08 0.04 250 / 30%);
+  }
+
+  .app-bottom-nav-item {
+    @apply flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-muted-foreground transition-all duration-200;
+    min-height: 60px;
+    position: relative;
+  }
+
+  .app-bottom-nav-item:hover {
+    @apply text-foreground;
+  }
+
+  .app-bottom-nav-item--active {
+    color: white;
+  }
+
+  .nav-pill-user {
+    position: absolute;
+    inset: 4px 6px;
+    border-radius: 14px;
+    background: linear-gradient(
+      135deg,
+      oklch(0.55 0.18 195),
+      oklch(0.45 0.2 220)
+    );
+    z-index: -1;
+    animation: tab-pop 0.25s ease-out;
+  }
+
+  .nav-pill-admin {
+    position: absolute;
+    inset: 4px 6px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, oklch(0.5 0.2 285), oklch(0.4 0.22 270));
+    z-index: -1;
+    animation: tab-pop 0.25s ease-out;
+  }
+
+  .pb-safe {
+    padding-bottom: var(--safe-area-bottom);
+  }
+}
+
+@layer utilities {
+  /* Slot status colors */
+  .slot-free {
+    color: #22c55e;
+  }
+  .slot-free-bg {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  .slot-free-glow {
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+  }
+  .slot-occupied {
+    color: #ef4444;
+  }
+  .slot-occupied-bg {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  .slot-occupied-glow {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+  }
+  .slot-booked {
+    color: #3b82f6;
+  }
+  .slot-booked-bg {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  .slot-booked-glow {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+  }
+  .step-slide-in {
+    animation: step-slide-in 0.3s ease-out;
+  }
+  .slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  .tab-pop {
+    animation: tab-pop 0.25s ease-out;
+  }
+
+  @keyframes step-slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 8px currentColor;
+    }
+    50% {
+      box-shadow: 0 0 20px currentColor;
+    }
+  }
+
+  @keyframes tab-pop {
+    0% {
+      transform: scale(0.9);
+    }
+    60% {
+      transform: scale(1.08);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float-particle {
+    0% {
+      transform: translateY(0) translateX(0) scale(1);
+      opacity: 0.15;
+    }
+    50% {
+      transform: translateY(-45vh) translateX(20px) scale(1.2);
+      opacity: 0.25;
+    }
+    100% {
+      transform: translateY(-100vh) translateX(-10px) scale(0.8);
+      opacity: 0;
+    }
+  }
+  .animate-float-particle {
+    animation: float-particle linear infinite;
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    15% {
+      transform: translateX(-6px);
+    }
+    30% {
+      transform: translateX(6px);
+    }
+    45% {
+      transform: translateX(-5px);
+    }
+    60% {
+      transform: translateX(5px);
+    }
+    75% {
+      transform: translateX(-3px);
+    }
+    90% {
+      transform: translateX(3px);
+    }
+  }
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-20px) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+  .animate-confetti-fall {
+    animation: confetti-fall linear forwards;
   }
 }

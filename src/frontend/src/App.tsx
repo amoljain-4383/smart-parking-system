@@ -1,5 +1,6 @@
+import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
-import { initializeParkingState } from "./lib/parkingStore";
+import { ThemeProvider } from "./context/ThemeContext";
 import AdminDashboard from "./pages/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -14,12 +15,11 @@ export type Session = {
 
 export type AppPage = "landing" | "login" | "admin" | "user";
 
-export default function App() {
+function AppInner() {
   const [page, setPage] = useState<AppPage>("landing");
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    initializeParkingState();
     const stored = localStorage.getItem("parkingSession");
     if (stored) {
       const s = JSON.parse(stored) as Session;
@@ -41,12 +41,7 @@ export default function App() {
   };
 
   if (page === "landing")
-    return (
-      <LandingPage
-        onBook={() => setPage("login")}
-        onAdmin={() => setPage("login")}
-      />
-    );
+    return <LandingPage onBook={() => setPage("login")} />;
   if (page === "login")
     return (
       <LoginPage onLogin={handleLogin} onBack={() => setPage("landing")} />
@@ -56,4 +51,13 @@ export default function App() {
   if (page === "user" && session)
     return <UserDashboard session={session} onLogout={handleLogout} />;
   return null;
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+      <Toaster richColors position="top-center" />
+    </ThemeProvider>
+  );
 }

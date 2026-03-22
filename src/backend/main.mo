@@ -70,6 +70,17 @@ actor {
   // Stripe configuration
   var stripeConfig : ?Stripe.StripeConfiguration = null;
 
+  // ---- Shared parking state (JSON) for cross-device sync ----
+  var sharedParkingState : Text = "";
+
+  public query func getSharedState() : async Text {
+    sharedParkingState
+  };
+
+  public func setSharedState(state : Text) : async () {
+    sharedParkingState := state;
+  };
+
   // Core logic
   public query ({ caller }) func isStripeConfigured() : async Bool {
     stripeConfig != null;
